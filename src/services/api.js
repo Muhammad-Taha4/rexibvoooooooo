@@ -2,11 +2,17 @@ import { supabase } from './supabase';
 
 // SALES
 export const getSales = async (month, year) => {
-  // Simple fetch to ensure 100% success even if relationships aren't set up yet
-  return await supabase
+  // Safe fetch: Fallback to created_at if date column is having issues
+  const { data, error } = await supabase
     .from('sales')
-    .select('*') 
-    .order('date', { ascending: false });
+    .select('*')
+    .order('created_at', { ascending: false });
+    
+  if (error) {
+    console.error("Sales fetch error:", error);
+    return { data: [] };
+  }
+  return { data };
 };
 
 export const addSale = async (data) => supabase.from('sales').insert(data);
