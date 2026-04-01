@@ -49,23 +49,27 @@ export const SaleModal = ({ sale = null, onClose, onSave }) => {
     try {
       let finalScreenshotUrl = formData.screenshot_url;
       
-      // 1. Upload screenshot if new one selected
+      // 1. Upload screenshot with safety catch (Don't let image failure block the sale)
       if (screenshotFile) {
-        // We'll need a saleId or temporary ID for the path. 
-        // For new sales, we might upload it with a timestamp
-        const tempId = sale?.id || `new_${Date.now()}`;
-        finalScreenshotUrl = await uploadScreenshot(screenshotFile, tempId);
+        try {
+          const tempId = sale?.id || `new_${Date.now()}`;
+          finalScreenshotUrl = await uploadScreenshot(screenshotFile, tempId);
+        } catch (imgErr) {
+          console.warn("Screenshot upload failed, proceeding with sale only:", imgErr);
+        }
       }
 
+      // 2. Prepare data with owner bypass
+      const ownerId = user?.id; // Taha's actual UID
       const saleData = {
         ...formData,
         amount_usd: Number(formData.amount_usd),
         upfront_usd: Number(formData.upfront_usd || 0),
         screenshot_url: finalScreenshotUrl,
-        // If they are a regular member, force their member_id
-        member_id: isAdmin ? formData.member_id : user?.user_metadata?.member_id || user?.id
+        member_id: isAdmin ? (formData.member_id || ownerId) : (user?.user_metadata?.member_id || ownerId)
       };
 
+      // 3. Save Sale
       if (sale) {
         await updateSale(sale.id, saleData);
       } else {
@@ -75,8 +79,9 @@ export const SaleModal = ({ sale = null, onClose, onSave }) => {
       onSave();
       onClose();
     } catch (err) {
-      console.error("Sale submisson failed:", err);
-      alert("Failed to save sale. Check your connection.");
+      console.error("Critical submission error:", err);
+      // Give a more helpful error
+      alert(`System Error: ${err.message || 'Check your database connection'}`);
     } finally {
       setLoading(false);
     }
