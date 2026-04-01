@@ -2,10 +2,10 @@ import { supabase } from './supabase';
 
 // SALES
 export const getSales = async (month, year) => {
-  // Fetch all sales and we will filter them in the UI for 100% Reliability
+  // Simple fetch to ensure 100% success even if relationships aren't set up yet
   return await supabase
     .from('sales')
-    .select('*, team_members(name)')
+    .select('*') 
     .order('date', { ascending: false });
 };
 

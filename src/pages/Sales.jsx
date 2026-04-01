@@ -64,7 +64,10 @@ export const Sales = () => {
     }
   };
 
-  const filteredSales = sales.filter(s => {
+  const filteredSales = sales.map(s => {
+    const member = members.find(m => m.id === s.member_id);
+    return { ...s, member_name: member?.name || 'Unknown' };
+  }).filter(s => {
     if (filters.search && !s.client_name?.toLowerCase().includes(filters.search.toLowerCase()) && !s.notes?.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.member !== 'all' && s.member_id !== filters.member) return false;
     if (filters.status !== 'all' && s.status !== filters.status) return false;

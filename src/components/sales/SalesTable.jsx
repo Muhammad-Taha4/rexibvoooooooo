@@ -60,7 +60,7 @@ export const SalesTable = ({ sales, onEdit, onDelete, onViewScreenshot, loading 
                     </div>
                     <div>
                       <div className="font-bold text-brand-text-primary capitalize">{sale.client_name || 'Generic Client'}</div>
-                      <div className="text-[10px] text-brand-text-muted font-medium">{sale.team_members?.name || 'Unknown Member'}</div>
+                      <div className="text-[10px] text-brand-text-muted font-medium">{sale.member_name || sale.member_id || 'Unknown Member'}</div>
                     </div>
                   </div>
                 </td>
