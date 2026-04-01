@@ -123,12 +123,24 @@ export const Team = () => {
         </div>
       </div>
 
-      <TeamGrid 
-        members={members} 
-        statsByMember={statsByMember} 
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {members.length === 0 ? (
+        <div className="card bg-brand-card/20 border-dashed border-brand-border/40 p-20 flex flex-col items-center justify-center text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary">
+            <Users size={32} />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-xl font-black text-white">No Sales Executives Found</h3>
+            <p className="text-brand-text-muted text-sm max-w-xs">Start building your team by adding your first record using the button above.</p>
+          </div>
+        </div>
+      ) : (
+        <TeamGrid 
+          members={members} 
+          statsByMember={statsByMember} 
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      )}
 
       {showAdd && (
         <MemberModal 

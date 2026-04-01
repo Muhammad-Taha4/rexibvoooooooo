@@ -168,8 +168,8 @@ export const Reports = () => {
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-2xl bg-brand-success/10 text-brand-success shadow-lg shadow-black/20"><TrendingUp size={24} /></div>
               <div>
-                <div className="text-[10px] font-bold text-brand-text-muted uppercase tracking-widest">Monthly Growth</div>
-                <div className="text-2xl font-black text-brand-success font-mono">+24.8%</div>
+                <div className="text-[10px] font-bold text-brand-text-muted uppercase tracking-widest">Active Members</div>
+                <div className="text-2xl font-black text-brand-success font-mono">{stats.memberCount} Team</div>
               </div>
             </div>
             <div className="flex items-center gap-4">
