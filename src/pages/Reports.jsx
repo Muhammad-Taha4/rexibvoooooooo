@@ -28,9 +28,9 @@ export const Reports = () => {
       setLoading(true);
       try {
         const [sumRes, memRes, trendRes] = await Promise.all([
-          getMonthlySummary(month, year),
-          getMemberStats(month, year),
-          getYearlyTrend(year)
+          getMonthlySummary(month, year).catch(() => ({ data: null })),
+          getMemberStats(month, year).catch(() => ({ data: [] })),
+          getYearlyTrend(year).catch(() => ({ data: [] }))
         ]);
 
         if (sumRes.data) {

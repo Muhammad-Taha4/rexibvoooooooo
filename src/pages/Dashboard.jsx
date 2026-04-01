@@ -34,9 +34,9 @@ export const Dashboard = () => {
       try {
         // Fetch real data from Supabase RPCs
         const [sumRes, memRes, trendRes] = await Promise.all([
-          getMonthlySummary(date.month, date.year),
-          getMemberStats(date.month, date.year),
-          getYearlyTrend(date.year)
+          getMonthlySummary(date.month, date.year).catch(() => ({ data: { revenue: 0, upfront: 0, profit: 0, total_salaries: 0, sales_count: 0, pending_count: 0 } })),
+          getMemberStats(date.month, date.year).catch(() => ({ data: [] })),
+          getYearlyTrend(date.year).catch(() => ({ data: [] }))
         ]);
 
         setStats(sumRes.data || {
@@ -118,8 +118,8 @@ export const Dashboard = () => {
               {[
                 { label: 'Platform ROI', value: '450%', icon: TrendingUp, color: 'text-brand-success' },
                 { label: 'Lead Conversion', value: '18.4%', icon: Users, color: 'text-brand-primary' },
-                { label: 'Avg Sale Value', value: `$${(stats.revenue / (stats.salesCount || 1)).toFixed(0)}`, icon: DollarSign, color: 'text-brand-secondary' },
-                { label: 'Collection Rate', value: `${((stats.upfront / (stats.revenue || 1)) * 100).toFixed(1)}%`, icon: Clock, color: 'text-brand-warning' }
+                { label: 'Avg Sale Value', value: stats.salesCount > 0 ? `$${((stats.revenue || 0) / stats.salesCount).toFixed(0)}` : '$0', icon: DollarSign, color: 'text-brand-secondary' },
+                { label: 'Collection Rate', value: stats.revenue > 0 ? `${(((stats.upfront || 0) / stats.revenue) * 100).toFixed(1)}%` : '0%', icon: Clock, color: 'text-brand-warning' }
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between group">
                   <div className="flex items-center gap-3">
