@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --color-brand-bg: #000000;
+  --color-brand-card: #0a0a0a;
+  --color-brand-border: #1e293b;
+  --color-brand-primary: #6366f1;
+  --color-brand-secondary: #8b5cf6;
+  --color-brand-success: #10b981;
+  --color-brand-warning: #f59e0b;
+  --color-brand-error: #f43f5e;
+  --color-brand-text-primary: #f8fafc;
+  --color-brand-text-secondary: #cbd5e1;
+  --color-brand-text-muted: #64748b;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text-primary font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+
+  .font-mono {
+    @apply font-mono;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-linear-to-br from-brand-primary to-brand-secondary text-white rounded-lg font-semibold transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.4)] active:scale-95;
+  }
+
+  .card {
+    @apply bg-brand-card border border-brand-border/30 rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 bg-brand-card border border-brand-border rounded-xl text-brand-text-primary placeholder:text-brand-text-muted outline-none focus:border-brand-primary transition-all shadow-inner;
+  }
+
+  select {
+    @apply bg-brand-card text-brand-text-primary border-brand-border/40;
+  }
+
+  /* Style the select options/menus for dark mode */
+  select option {
+    @apply bg-brand-card text-brand-text-primary;
+  }
+}
