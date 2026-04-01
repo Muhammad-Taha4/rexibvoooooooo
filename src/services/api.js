@@ -2,10 +2,11 @@ import { supabase } from './supabase';
 
 // SALES
 export const getSales = async (month, year) => {
-  let query = supabase.from('sales').select('*, team_members(name)');
-  if (month !== 'all') query = query.eq('month', month);
-  if (year) query = query.eq('year', year);
-  return await query.order('date', { ascending: false });
+  // Fetch all sales and we will filter them in the UI for 100% Reliability
+  return await supabase
+    .from('sales')
+    .select('*, team_members(name)')
+    .order('date', { ascending: false });
 };
 
 export const addSale = async (data) => supabase.from('sales').insert(data);
