@@ -15,9 +15,10 @@ export const MemberBreakdown = ({ data, totalSalaries }) => {
               <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Member</th>
               <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Sales</th>
               <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Revenue ($)</th>
-              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Profit (PKR)</th>
-              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Salary (PKR)</th>
-              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Pending</th>
+              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Commission (PKR)</th>
+              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Base Salary (PKR)</th>
+              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Total Pay (PKR)</th>
+              <th className="px-6 py-4 font-bold text-brand-text-muted uppercase tracking-widest text-[9px]">Net Profit (PKR)</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-brand-border/10">
@@ -30,25 +31,23 @@ export const MemberBreakdown = ({ data, totalSalaries }) => {
                   <div className="font-bold text-white group-hover:text-brand-primary transition-colors">{m.name}</div>
                 </td>
                 <td className="px-6 py-4 font-mono font-bold text-brand-text-primary uppercase">{m.salesCount}</td>
-                <td className="px-6 py-4 font-mono text-brand-text-primary">${m.revenue.toLocaleString()}</td>
-                <td className="px-6 py-4 font-mono font-bold text-brand-success">PKR {m.profit.toLocaleString()}</td>
-                <td className="px-6 py-4 font-mono text-brand-error">PKR {(m.salary || 15000).toLocaleString()}</td>
-                <td className="px-6 py-4">
-                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${(m.pendingCount || 0) > 0 ? 'bg-brand-warning/10 text-brand-warning border border-brand-warning/20' : 'bg-brand-success/10 text-brand-success border border-brand-success/20'}`}>
-                    {m.pendingCount || 0}
-                  </span>
-                </td>
+                <td className="px-6 py-4 font-mono text-brand-text-primary">${(m.revenue || 0).toLocaleString()}</td>
+                <td className="px-6 py-4 font-mono text-brand-secondary">PKR {(m.commission || 0).toLocaleString()}</td>
+                <td className="px-6 py-4 font-mono text-brand-text-muted">PKR {(m.salary || 15000).toLocaleString()}</td>
+                <td className="px-6 py-4 font-mono text-brand-error">PKR {(m.totalPayable || 0).toLocaleString()}</td>
+                <td className="px-6 py-4 font-mono font-bold text-brand-success">PKR {(m.profit || 0).toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
           <tfoot className="bg-brand-primary/5 font-bold sticky bottom-0 border-t-2 border-brand-primary/20">
             <tr className="text-white">
-              <td className="px-6 py-4 uppercase tracking-[0.2em] font-black">Total Executive Metrics</td>
+              <td className="px-6 py-4 uppercase tracking-[0.2em] font-black">TOTAL BUSINESS ANALYTICS</td>
               <td className="px-6 py-4 font-mono">{data.reduce((a, b) => a + (b.salesCount || 0), 0)}</td>
-              <td className="px-6 py-4 font-mono">${(data.reduce((a, b) => a + (b.revenue || 0), 0) || 0).toLocaleString()}</td>
-              <td className="px-6 py-4 font-mono text-brand-success">PKR {(data.reduce((a, b) => a + (b.profit || 0), 0) || 0).toLocaleString()}</td>
-              <td className="px-6 py-4 font-mono text-brand-error uppercase tracking-widest">PKR {(totalSalaries || 0).toLocaleString()}</td>
-              <td className="px-6 py-4"></td>
+              <td className="px-6 py-4 font-mono text-brand-primary">${(data.reduce((a, b) => a + (b.revenue || 0), 0) || 0).toLocaleString()}</td>
+              <td className="px-6 py-4 font-mono text-brand-secondary">PKR {(data.reduce((a, b) => a + (b.commission || 0), 0) || 0).toLocaleString()}</td>
+              <td className="px-6 py-4 font-mono text-brand-text-muted">PKR {(data.reduce((a, b) => a + (b.salary || 15000), 0) || 0).toLocaleString()}</td>
+              <td className="px-6 py-4 font-mono text-brand-error">PKR {(data.reduce((a, b) => a + (b.totalPayable || 0), 0) || 0).toLocaleString()}</td>
+              <td className="px-6 py-4 font-mono text-brand-success bg-brand-success/10 border-l border-brand-success/20">PKR {(data.reduce((a, b) => a + (b.profit || 0), 0) || 0).toLocaleString()}</td>
             </tr>
           </tfoot>
         </table>

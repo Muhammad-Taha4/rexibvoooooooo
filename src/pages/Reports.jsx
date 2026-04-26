@@ -112,7 +112,19 @@ export const Reports = () => {
 
   const handleExportCSV = () => {
     const header = "Member,Sales,Revenue (USD),Commission (PKR),Base Salary (PKR),Total Payable (PKR),Net Profit (PKR),Pending\n";
-    const rows = memberBreakdown.map(m => `${m.name},${m.salesCount},${m.revenue},${m.commission},${m.salary},${m.totalPayable},${m.profit},${m.pendingCount}`).join("\n");
+    let rows = memberBreakdown.map(m => `${m.name},${m.salesCount},${m.revenue},${m.commission},${m.salary},${m.totalPayable},${m.profit},${m.pendingCount}`).join("\n");
+    
+    // Total Row
+    const totals = {
+      sales: memberBreakdown.reduce((a, b) => a + (b.salesCount || 0), 0),
+      rev: memberBreakdown.reduce((a, b) => a + (b.revenue || 0), 0),
+      comm: memberBreakdown.reduce((a, b) => a + (b.commission || 0), 0),
+      sal: memberBreakdown.reduce((a, b) => a + (b.salary || 15000), 0),
+      pay: memberBreakdown.reduce((a, b) => a + (b.totalPayable || 0), 0),
+      profit: memberBreakdown.reduce((a, b) => a + (b.profit || 0), 0),
+    };
+    rows += `\nTOTAL,${totals.sales},${totals.rev},${totals.comm},${totals.sal},${totals.pay},${totals.profit},`;
+
     const blob = new Blob([header + rows], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -135,6 +147,18 @@ export const Reports = () => {
     memberBreakdown.forEach(m => {
       content += `${m.name || 'Unknown'}: ${m.salesCount || 0} sales | $${(m.revenue || 0).toLocaleString()} | Comm: PKR ${(m.commission || 0).toLocaleString()} | Base Salary: PKR ${(m.salary || 0).toLocaleString()} | Total Pay: PKR ${(m.totalPayable || 0).toLocaleString()} | Net Profit: PKR ${(m.profit || 0).toLocaleString()}\n`;
     });
+    
+    const totals = {
+      sales: memberBreakdown.reduce((a, b) => a + (b.salesCount || 0), 0),
+      rev: memberBreakdown.reduce((a, b) => a + (b.revenue || 0), 0),
+      comm: memberBreakdown.reduce((a, b) => a + (b.commission || 0), 0),
+      sal: memberBreakdown.reduce((a, b) => a + (b.salary || 15000), 0),
+      pay: memberBreakdown.reduce((a, b) => a + (b.totalPayable || 0), 0),
+      profit: memberBreakdown.reduce((a, b) => a + (b.profit || 0), 0),
+    };
+    
+    content += "-".repeat(50) + "\n";
+    content += `OVERALL TOTALS: ${totals.sales} sales | $${totals.rev.toLocaleString()} Revenue | Total Commission: PKR ${totals.comm.toLocaleString()} | Total Salaries: PKR ${totals.sal.toLocaleString()} | TOTAL PAYOUT: PKR ${totals.pay.toLocaleString()} | TOTAL COMPANY PROFIT: PKR ${totals.profit.toLocaleString()}\n`;
     
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
