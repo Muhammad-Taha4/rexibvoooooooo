@@ -3,8 +3,8 @@ import { TrendingUp, Users, Wallet } from 'lucide-react';
 export const ReportSummary = ({ stats }) => {
   const summaryCards = [
     { label: 'Total Salaries', value: `PKR ${(stats?.totalSalaries || 0).toLocaleString()}`, sub: `${stats?.memberCount || 0} members active`, icon: Users, color: 'text-brand-error', bg: 'bg-brand-error/10' },
-    { label: 'Gross Profit', value: `PKR ${(stats?.grossProfit || 0).toLocaleString()}`, sub: `From $${(stats?.revenue || 0).toLocaleString()} revenue`, icon: Wallet, color: 'text-brand-success', bg: 'bg-brand-success/10' },
-    { label: 'Net Profit', value: `PKR ${(stats?.netProfit || 0).toLocaleString()}`, sub: (stats?.netProfit || 0) >= 0 ? "Profit after salaries" : "Current loss", icon: TrendingUp, color: (stats?.netProfit || 0) >= 0 ? 'text-brand-primary' : 'text-brand-error', bg: (stats?.netProfit || 0) >= 0 ? 'bg-brand-primary/10' : 'bg-brand-error/10' },
+    { label: 'Total Commissions', value: `PKR ${(stats?.grossProfit || 0).toLocaleString()}`, sub: `From $${(stats?.revenue || 0).toLocaleString()} revenue`, icon: Wallet, color: 'text-brand-warning', bg: 'bg-brand-warning/10' },
+    { label: 'Company Net Profit', value: `PKR ${(stats?.netProfit || 0).toLocaleString()}`, sub: `Approx. $${(stats?.companyProfitUSD || 0).toFixed(2)}`, icon: TrendingUp, color: (stats?.netProfit || 0) >= 0 ? 'text-brand-success' : 'text-brand-error', bg: (stats?.netProfit || 0) >= 0 ? 'bg-brand-success/10' : 'bg-brand-error/10' },
   ];
 
   return (

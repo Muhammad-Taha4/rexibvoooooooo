@@ -50,14 +50,25 @@ export const Dashboard = () => {
         // Calculate Stats
         const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
         const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
-        const profit = revenue * 50; // Assuming 1 USD = 50 PKR profit for calculation
-        const totalSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        
+        // PAYOUTS
+        const totalCommissions = revenue * 50; 
+        const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        const totalPayoutPKR = totalCommissions + totalBaseSalaries;
+        
+        // COMPANY PROFIT (Assuming 280 PKR/USD exchange rate for company earnings)
+        const exchangeRate = 280;
+        const totalRevenuePKR = revenue * exchangeRate;
+        const netBusinessProfitPKR = totalRevenuePKR - totalPayoutPKR;
+        const netBusinessProfitUSD = netBusinessProfitPKR / exchangeRate;
         
         setStats({
           revenue,
           upfront,
-          profit,
-          netProfit: profit - totalSalaries,
+          profit: totalCommissions, // Member Commissions
+          companyProfitPKR: netBusinessProfitPKR,
+          companyProfitUSD: netBusinessProfitUSD,
+          netProfit: netBusinessProfitPKR, // For backward compatibility in StatCards
           salesCount: filteredSales.length,
           pendingCount: filteredSales.filter(s => s.status === 'pending').length
         });

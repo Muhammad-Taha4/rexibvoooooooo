@@ -3,9 +3,9 @@ import { DollarSign, TrendingUp, BarChart3, Clock, ArrowUpRight, ArrowDownRight 
 export const StatCards = ({ stats }) => {
   const cards = [
     { label: 'Total Revenue', value: `$${(stats?.revenue || 0).toLocaleString()}`, sub: `${stats?.salesCount || 0} deals closed`, icon: DollarSign, color: 'text-brand-primary', bg: 'bg-brand-primary/10', trend: true },
-    { label: 'Upfront Received', value: `$${(stats?.upfront || 0).toLocaleString()}`, sub: `$${((stats?.revenue || 0) - (stats?.upfront || 0)).toLocaleString()} outstanding`, icon: TrendingUp, color: 'text-brand-secondary', bg: 'bg-brand-secondary/10', trend: true },
-    { label: 'Total Profit', value: `PKR ${(stats?.profit || 0).toLocaleString()}`, sub: `Net: PKR ${(stats?.netProfit || 0).toLocaleString()}`, icon: BarChart3, color: 'text-brand-success', bg: 'bg-brand-success/10', trend: (stats?.netProfit || 0) > 0 },
-    { label: 'Pending Sales', value: stats?.pendingCount || 0, sub: 'Awaiting verification', icon: Clock, color: 'text-brand-warning', bg: 'bg-brand-warning/10', trend: false },
+    { label: 'Total Commissions', value: `PKR ${(stats?.profit || 0).toLocaleString()}`, sub: 'Payout to team members', icon: TrendingUp, color: 'text-brand-secondary', bg: 'bg-brand-secondary/10', trend: true },
+    { label: 'Base Salaries', value: `PKR ${(stats?.totalSalaries || (stats?.memberCount * 15000) || 0).toLocaleString()}`, sub: 'Monthly fixed cost', icon: Clock, color: 'text-brand-warning', bg: 'bg-brand-warning/10', trend: false },
+    { label: 'Company Net Profit', value: `PKR ${(stats?.companyProfitPKR || 0).toLocaleString()}`, sub: `Approx. $${(stats?.companyProfitUSD || 0).toFixed(2)}`, icon: BarChart3, color: 'text-brand-success', bg: 'bg-brand-success/10', trend: (stats?.companyProfitPKR || 0) > 0 },
   ];
 
   return (

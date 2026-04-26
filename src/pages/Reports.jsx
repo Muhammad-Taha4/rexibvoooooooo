@@ -45,15 +45,22 @@ export const Reports = () => {
         // Calculate Monthly Summary Stats
         const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
         const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
-        const grossProfit = revenue * 50; 
-        const totalSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        
+        // PAYOUTS
+        const totalCommissions = revenue * 50; 
+        const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        
+        // COMPANY PROFIT (Assuming 280 PKR/USD exchange rate)
+        const exchangeRate = 280;
+        const netBusinessProfitPKR = (revenue * exchangeRate) - (totalCommissions + totalBaseSalaries);
         
         setStats({
           revenue,
           upfront,
-          grossProfit,
-          totalSalaries,
-          netProfit: grossProfit - totalSalaries,
+          grossProfit: totalCommissions, // Now labels as Commissions
+          totalSalaries: totalBaseSalaries,
+          netProfit: netBusinessProfitPKR,
+          companyProfitUSD: netBusinessProfitPKR / exchangeRate,
           memberCount: allMembers.length
         });
 
