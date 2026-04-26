@@ -4,7 +4,7 @@ import { StatCards } from '../components/dashboard/StatCards';
 import { RevenueChart } from '../components/dashboard/RevenueChart';
 import { SalesByMember } from '../components/dashboard/SalesByMember';
 import { TeamPerformance } from '../components/dashboard/TeamPerformance';
-import { getMonthlySummary, getMemberStats, getYearlyTrend } from '../services/api';
+import { getSales, getTeamMembers } from '../services/api';
 
 export const Dashboard = () => {
   const [loading, setLoading] = useState(true);

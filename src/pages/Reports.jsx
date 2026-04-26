@@ -4,7 +4,7 @@ import { ReportSummary } from '../components/reports/ReportSummary';
 import { ProfitChart } from '../components/reports/ProfitChart';
 import { MemberBreakdown } from '../components/reports/MemberBreakdown';
 import { ExportButtons } from '../components/reports/ExportButtons';
-import { getMonthlySummary, getMemberStats, getYearlyTrend } from '../services/api';
+import { getSales, getTeamMembers } from '../services/api';
 
 export const Reports = () => {
   const [loading, setLoading] = useState(true);

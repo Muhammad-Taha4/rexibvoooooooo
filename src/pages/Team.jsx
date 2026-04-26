@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Users, Filter, Plus, RotateCw } from 'lucide-react';
 import { TeamGrid } from '../components/team/TeamGrid';
 import { MemberModal } from '../components/team/MemberModal';
-import { getTeamMembers, getMemberStats, deleteTeamMember } from '../services/api';
+import { getSales, getTeamMembers, deleteTeamMember } from '../services/api';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 export const Team = () => {
