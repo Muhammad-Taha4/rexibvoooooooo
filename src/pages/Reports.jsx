@@ -27,35 +27,65 @@ export const Reports = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [sumRes, memRes, trendRes] = await Promise.all([
-          getMonthlySummary(month, year).catch(() => ({ data: null })),
-          getMemberStats(month, year).catch(() => ({ data: [] })),
-          getYearlyTrend(year).catch(() => ({ data: [] }))
+        // Fetch raw data instead of RPCs for robustness
+        const [salesRes, membersRes] = await Promise.all([
+          getSales(),
+          getTeamMembers()
         ]);
 
-        if (sumRes.data) {
-          setStats({
-            revenue: sumRes.data.revenue || 0,
-            upfront: sumRes.data.upfront || 0,
-            grossProfit: sumRes.data.profit || 0,
-            totalSalaries: sumRes.data.total_salaries || 0,
-            netProfit: (sumRes.data.profit || 0) - (sumRes.data.total_salaries || 0),
-            memberCount: memRes.data?.length || 0
+        const allSales = salesRes.data || [];
+        const allMembers = membersRes.data || [];
+
+        // Filter by month/year for the current summary
+        const filteredSales = allSales.filter(s => {
+          const d = new Date(s.date || s.created_at);
+          return d.getMonth() === month && d.getFullYear() === year;
+        });
+
+        // Calculate Monthly Summary Stats
+        const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
+        const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
+        const grossProfit = revenue * 50; 
+        const totalSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        
+        setStats({
+          revenue,
+          upfront,
+          grossProfit,
+          totalSalaries,
+          netProfit: grossProfit - totalSalaries,
+          memberCount: allMembers.length
+        });
+
+        // Prepare Member Breakdown
+        const breakdown = allMembers.map(m => {
+          const mSales = filteredSales.filter(s => s.member_id === m.id);
+          const mRev = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
+          return {
+            id: m.id,
+            name: m.name,
+            salesCount: mSales.length,
+            revenue: mRev,
+            profit: mRev * 50,
+            salary: m.salary_pkr || 15000,
+            pendingCount: mSales.filter(s => s.status === 'pending').length
+          };
+        });
+        setMemberBreakdown(breakdown);
+
+        // Prepare Profit Trend (PKR) for the year
+        const yearlyTrend = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, i) => {
+          const monthSales = allSales.filter(s => {
+            const d = new Date(s.date || s.created_at);
+            return d.getMonth() === i && d.getFullYear() === year;
           });
-          setProfitTrend(trendRes.data || []);
-          setMemberBreakdown(memRes.data || []);
-        } else {
-          setStats({
-            revenue: 0,
-            upfront: 0,
-            grossProfit: 0,
-            totalSalaries: 0,
-            netProfit: 0,
-            memberCount: 0
-          });
-          setProfitTrend([]);
-          setMemberBreakdown([]);
-        }
+          return {
+            month: m,
+            profit: monthSales.reduce((a, s) => a + (s.amount_usd || 0), 0) * 50
+          };
+        });
+        setProfitTrend(yearlyTrend);
+
       } catch (err) {
         console.error("Reports fetch error:", err);
       } finally {

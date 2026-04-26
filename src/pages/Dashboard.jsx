@@ -32,26 +32,62 @@ export const Dashboard = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch real data from Supabase RPCs
-        const [sumRes, memRes, trendRes] = await Promise.all([
-          getMonthlySummary(date.month, date.year).catch(() => ({ data: { revenue: 0, upfront: 0, profit: 0, total_salaries: 0, sales_count: 0, pending_count: 0 } })),
-          getMemberStats(date.month, date.year).catch(() => ({ data: [] })),
-          getYearlyTrend(date.year).catch(() => ({ data: [] }))
+        // Fetch raw data instead of RPCs for robustness
+        const [salesRes, membersRes] = await Promise.all([
+          getSales(),
+          getTeamMembers()
         ]);
 
-        setStats(sumRes.data || {
-          revenue: 0,
-          upfront: 0,
-          profit: 0,
-          netProfit: 0,
-          salesCount: 0,
-          pendingCount: 0
+        const allSales = salesRes.data || [];
+        const allMembers = membersRes.data || [];
+
+        // Filter by month/year
+        const filteredSales = allSales.filter(s => {
+          const d = new Date(s.date || s.created_at);
+          return d.getMonth() === date.month && d.getFullYear() === date.year;
+        });
+
+        // Calculate Stats
+        const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
+        const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
+        const profit = revenue * 50; // Assuming 1 USD = 50 PKR profit for calculation
+        const totalSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        
+        setStats({
+          revenue,
+          upfront,
+          profit,
+          netProfit: profit - totalSalaries,
+          salesCount: filteredSales.length,
+          pendingCount: filteredSales.filter(s => s.status === 'pending').length
+        });
+
+        // Prepare Chart Data
+        const memberStats = allMembers.map(m => {
+          const mSales = filteredSales.filter(s => s.member_id === m.id);
+          return {
+            name: m.name,
+            revenue: mSales.reduce((a, s) => a + (s.amount_usd || 0), 0),
+            sales_count: mSales.length
+          };
+        });
+
+        // Yearly Trend (for the current year)
+        const yearlyTrend = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, i) => {
+          const monthSales = allSales.filter(s => {
+            const d = new Date(s.date || s.created_at);
+            return d.getMonth() === i && d.getFullYear() === date.year;
+          });
+          return {
+            month: m,
+            revenue: monthSales.reduce((a, s) => a + (s.amount_usd || 0), 0)
+          };
         });
 
         setCharts({
-          revenueTrend: trendRes.data || [],
-          salesByMember: memRes.data?.map(m => ({ name: m.name, value: m.revenue })) || [],
-          teamPerformance: memRes.data?.map(m => ({ name: m.name, value: m.sales_count })) || []
+          revenueTrend: yearlyTrend,
+          salesByMember: memberStats.map(m => ({ name: m.name, value: m.revenue })),
+          teamPerformance: memberStats.map(m => ({ name: m.name, value: m.sales_count }))
         });
       } catch (err) {
         console.error("Dashboard fetch error:", err);

@@ -41,27 +41,35 @@ export const Team = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [membersRes, statsRes] = await Promise.all([
+      // Fetch raw data instead of RPCs for robustness
+      const [membersRes, salesRes] = await Promise.all([
         getTeamMembers(),
-        getMemberStats(month, new Date().getFullYear())
+        getSales()
       ]);
 
-      setMembers(membersRes.data || []);
+      const allMembers = membersRes.data || [];
+      const allSales = salesRes.data || [];
 
-      if (statsRes.data) {
-        const statsMap = {};
-        statsRes.data.forEach(s => {
-          statsMap[s.id] = {
-            revenue: s.revenue,
-            profit: s.profit,
-            salesCount: s.sales_count,
-            pendingCount: s.pending_count
-          };
+      setMembers(allMembers);
+
+      // Aggregate stats per member for the selected month
+      const statsMap = {};
+      allMembers.forEach(m => {
+        const mSales = allSales.filter(s => {
+          const d = new Date(s.date || s.created_at);
+          return s.member_id === m.id && d.getMonth() === month && d.getFullYear() === new Date().getFullYear();
         });
-        setStatsByMember(statsMap);
-      } else {
-        setStatsByMember({});
-      }
+
+        const revenue = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
+        statsMap[m.id] = {
+          revenue: revenue,
+          profit: revenue * 50,
+          salesCount: mSales.length,
+          pendingCount: mSales.filter(s => s.status === 'pending').length
+        };
+      });
+      setStatsByMember(statsMap);
+
     } catch (err) {
       console.error("Team fetch error:", err);
     } finally {
