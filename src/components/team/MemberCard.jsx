@@ -64,7 +64,7 @@ export const MemberCard = ({ member, stats, onEdit, onDelete }) => {
       <div className="grid grid-cols-2 gap-4 flex-1">
         {[
           { label: 'Revenue', value: `$${(stats?.revenue || 0).toLocaleString()}`, icon: DollarSign, color: 'text-brand-primary' },
-          { label: 'Profit', value: `PKR ${(stats?.profit || 0).toLocaleString()}`, icon: BarChart3, color: 'text-brand-success' },
+          { label: 'Commission', value: `PKR ${(stats?.commission || 0).toLocaleString()}`, icon: BarChart3, color: 'text-brand-success' },
           { label: 'Sales', value: (stats?.salesCount || 0).toLocaleString(), icon: Clock, color: 'text-brand-secondary' },
           { label: 'Pending', value: (stats?.pendingCount || 0).toLocaleString(), icon: Clock, color: 'text-brand-warning' },
         ].map((s, i) => (
@@ -75,13 +75,19 @@ export const MemberCard = ({ member, stats, onEdit, onDelete }) => {
         ))}
       </div>
 
-      <div className="mt-6 pt-6 border-t border-brand-border/20 flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="text-[9px] font-bold text-brand-text-muted uppercase tracking-widest leading-none">Monthly Salary</div>
-          <div className="text-sm font-black text-white font-mono leading-none">PKR {(member.salary_pkr || 15000).toLocaleString()}</div>
+      <div className="mt-6 pt-6 border-t border-brand-border/20 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="text-[9px] font-bold text-brand-text-muted uppercase tracking-widest leading-none">Base Salary</div>
+            <div className="text-sm font-black text-white/70 font-mono leading-none">PKR {(member.salary_pkr || 15000).toLocaleString()}</div>
+          </div>
+          <div className="space-y-1 text-right">
+            <div className="text-[9px] font-bold text-brand-text-muted uppercase tracking-widest leading-none">Total Payout</div>
+            <div className="text-base font-black text-brand-primary font-mono leading-none">PKR {(stats?.totalPayable || (member.salary_pkr || 15000)).toLocaleString()}</div>
+          </div>
         </div>
-        <div className={`text-[10px] font-bold px-3 py-1.5 rounded-full border ${isProfitable ? 'bg-brand-success/10 text-brand-success border-brand-success/20' : 'bg-brand-error/10 text-brand-error border-brand-error/20'} uppercase tracking-widest`}>
-          {isProfitable ? 'Profitable' : 'Net Loss'}
+        <div className={`w-full text-center text-[10px] font-bold px-3 py-2 rounded-xl border ${isProfitable ? 'bg-brand-success/10 text-brand-success border-brand-success/20' : 'bg-brand-error/10 text-brand-error border-brand-error/20'} uppercase tracking-[0.2em]`}>
+          {isProfitable ? 'Performance: High' : 'Performance: Growing'}
         </div>
       </div>
       

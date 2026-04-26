@@ -61,9 +61,14 @@ export const Team = () => {
         });
 
         const revenue = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
+        const commission = revenue * 50;
+        const baseSalary = m.salary_pkr || 15000;
+        
         statsMap[m.id] = {
           revenue: revenue,
-          profit: revenue * 50,
+          profit: commission, // Commission for the member
+          commission: commission,
+          totalPayable: baseSalary + commission,
           salesCount: mSales.length,
           pendingCount: mSales.filter(s => s.status === 'pending').length
         };
