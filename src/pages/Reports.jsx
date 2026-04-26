@@ -70,13 +70,16 @@ export const Reports = () => {
           const mRev = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
           const mComm = mRev * 50;
           const mSalary = m.salary_pkr || 15000;
+          const exchangeRate = 280;
+          const mNetProfit = (mRev * exchangeRate) - (mComm + mSalary);
+          
           return {
             id: m.id,
             name: m.name,
             salesCount: mSales.length,
             revenue: mRev,
             commission: mComm,
-            profit: mComm,
+            profit: mNetProfit, // Net profit for the company from this member
             salary: mSalary,
             totalPayable: mComm + mSalary,
             pendingCount: mSales.filter(s => s.status === 'pending').length
@@ -108,8 +111,8 @@ export const Reports = () => {
   }, [month, year]);
 
   const handleExportCSV = () => {
-    const header = "Member,Sales,Revenue (USD),Commission (PKR),Base Salary (PKR),Total Payable (PKR),Pending\n";
-    const rows = memberBreakdown.map(m => `${m.name},${m.salesCount},${m.revenue},${m.commission},${m.salary},${m.totalPayable},${m.pendingCount}`).join("\n");
+    const header = "Member,Sales,Revenue (USD),Commission (PKR),Base Salary (PKR),Total Payable (PKR),Net Profit (PKR),Pending\n";
+    const rows = memberBreakdown.map(m => `${m.name},${m.salesCount},${m.revenue},${m.commission},${m.salary},${m.totalPayable},${m.profit},${m.pendingCount}`).join("\n");
     const blob = new Blob([header + rows], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -130,7 +133,7 @@ export const Reports = () => {
     content += `Active Members: ${stats.memberCount}\n\n`;
     content += `MEMBER BREAKDOWN\n` + "-".repeat(50) + "\n";
     memberBreakdown.forEach(m => {
-      content += `${m.name || 'Unknown'}: ${m.salesCount || 0} sales | $${(m.revenue || 0).toLocaleString()} | Comm: PKR ${(m.commission || 0).toLocaleString()} | Base Salary: PKR ${(m.salary || 0).toLocaleString()} | Total: PKR ${(m.totalPayable || 0).toLocaleString()}\n`;
+      content += `${m.name || 'Unknown'}: ${m.salesCount || 0} sales | $${(m.revenue || 0).toLocaleString()} | Comm: PKR ${(m.commission || 0).toLocaleString()} | Base Salary: PKR ${(m.salary || 0).toLocaleString()} | Total Pay: PKR ${(m.totalPayable || 0).toLocaleString()} | Net Profit: PKR ${(m.profit || 0).toLocaleString()}\n`;
     });
     
     const blob = new Blob([content], { type: 'text/plain' });
