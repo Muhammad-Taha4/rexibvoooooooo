@@ -111,10 +111,7 @@ export const Reports = () => {
   }, [month, year]);
 
   const handleExportCSV = () => {
-    const header = "Member,Sales,Revenue (USD),Commission (PKR),Base Salary (PKR),Total Payable (PKR),Net Profit (PKR),Pending\n";
-    let rows = memberBreakdown.map(m => `${m.name},${m.salesCount},${m.revenue},${m.commission},${m.salary},${m.totalPayable},${m.profit},${m.pendingCount}`).join("\n");
-    
-    // Total Row
+    // Calculate Totals
     const totals = {
       sales: memberBreakdown.reduce((a, b) => a + (b.salesCount || 0), 0),
       rev: memberBreakdown.reduce((a, b) => a + (b.revenue || 0), 0),
@@ -123,9 +120,21 @@ export const Reports = () => {
       pay: memberBreakdown.reduce((a, b) => a + (b.totalPayable || 0), 0),
       profit: memberBreakdown.reduce((a, b) => a + (b.profit || 0), 0),
     };
-    rows += `\nTOTAL,${totals.sales},${totals.rev},${totals.comm},${totals.sal},${totals.pay},${totals.profit},`;
 
-    const blob = new Blob([header + rows], { type: 'text/csv' });
+    let csvContent = `SUMMARY REPORT - ${month+1}/${year}\n`;
+    csvContent += `TOTAL REVENUE,${totals.rev} USD\n`;
+    csvContent += `TOTAL COMMISSIONS,${totals.comm} PKR\n`;
+    csvContent += `TOTAL BASE SALARIES,${totals.sal} PKR\n`;
+    csvContent += `TOTAL PAYOUT (COMM+SALARY),${totals.pay} PKR\n`;
+    csvContent += `TOTAL COMPANY PROFIT (NET SAVING),${totals.profit} PKR\n\n`;
+
+    const header = "Member,Sales,Revenue (USD),Commission (PKR),Base Salary (PKR),Total Payable (PKR),Net Profit (PKR),Pending\n";
+    const rows = memberBreakdown.map(m => `${m.name},${m.salesCount},${m.revenue},${m.commission},${m.salary},${m.totalPayable},${m.profit},${m.pendingCount}`).join("\n");
+    
+    csvContent += header + rows;
+    csvContent += `\n\nGRAND TOTAL,${totals.sales},${totals.rev},${totals.comm},${totals.sal},${totals.pay},${totals.profit},`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
