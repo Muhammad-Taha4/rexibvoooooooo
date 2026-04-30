@@ -52,13 +52,16 @@ export const Dashboard = () => {
         const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
         const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
         
-        // PAYOUTS (per-sale slab commission engine)
-        const totalCommissions = calculateTotalCommission(filteredSales);
+        // PAYOUTS: commission slab applied per-member on their total revenue
+        const exchangeRate = 280;
+        const totalCommissions = allMembers.reduce((sum, m) => {
+          const mSales = filteredSales.filter(s => s.member_id === m.id);
+          return sum + calculateTotalCommission(mSales);
+        }, 0);
         const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
         const totalPayoutPKR = totalCommissions + totalBaseSalaries;
         
-        // COMPANY PROFIT (Assuming 280 PKR/USD exchange rate for company earnings)
-        const exchangeRate = 280;
+        // COMPANY PROFIT
         const totalRevenuePKR = revenue * exchangeRate;
         const netBusinessProfitPKR = totalRevenuePKR - totalPayoutPKR;
         const netBusinessProfitUSD = netBusinessProfitPKR / exchangeRate;

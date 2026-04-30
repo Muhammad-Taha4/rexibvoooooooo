@@ -35,14 +35,14 @@ export const calculateCommission = (amountUsd) => {
 };
 
 /**
- * Calculate total commission for an array of sales.
- * Each sale's commission is calculated individually using the slab system.
+ * Calculate commission for an array of sales based on their TOTAL revenue.
+ * The slab is applied on the AGGREGATE revenue, NOT per individual sale.
+ * Example: 8 sales totaling $325 → floor(325/100) * 5000 = 15,000 PKR
  * @param {Array} sales - Array of sale objects with amount_usd field
  * @returns {number} Total commission in PKR
  */
 export const calculateTotalCommission = (sales) => {
   if (!Array.isArray(sales)) return 0;
-  return sales.reduce((total, sale) => {
-    return total + calculateCommission(sale.amount_usd || 0);
-  }, 0);
+  const totalRevenue = sales.reduce((sum, sale) => sum + (sale.amount_usd || 0), 0);
+  return calculateCommission(totalRevenue);
 };

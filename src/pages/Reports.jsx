@@ -54,18 +54,10 @@ export const Reports = () => {
         const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
         const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
         
-        // PAYOUTS (per-sale slab commission engine)
-        const totalCommissions = calculateTotalCommission(filteredSales);
-        const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
-        const totalExpense = totalCommissions + totalBaseSalaries;
-        
         // COMPANY PROFIT (Assuming 280 PKR/USD exchange rate)
         const exchangeRate = 280;
-        const totalRevenuePKR = revenue * exchangeRate;
-        const netBusinessProfitPKR = totalRevenuePKR - totalExpense;
-        const profitMargin = totalRevenuePKR > 0 ? (netBusinessProfitPKR / totalRevenuePKR) * 100 : 0;
         
-        // Prepare Member Breakdown
+        // Prepare Member Breakdown FIRST (commission slab applied per-member on their total revenue)
         const breakdown = allMembers.map(m => {
           const mSales = filteredSales.filter(s => s.member_id === m.id);
           const mRev = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
@@ -85,6 +77,15 @@ export const Reports = () => {
             pendingCount: mSales.filter(s => s.status === 'pending').length
           };
         });
+
+        // PAYOUTS: sum each member's slab commission (not one slab on total)
+        const totalCommissions = breakdown.reduce((sum, m) => sum + m.commission, 0);
+        const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
+        const totalExpense = totalCommissions + totalBaseSalaries;
+        
+        const totalRevenuePKR = revenue * exchangeRate;
+        const netBusinessProfitPKR = totalRevenuePKR - totalExpense;
+        const profitMargin = totalRevenuePKR > 0 ? (netBusinessProfitPKR / totalRevenuePKR) * 100 : 0;
 
         // Insights
         const sortedMembers = [...breakdown].sort((a, b) => b.revenue - a.revenue);
@@ -115,9 +116,14 @@ export const Reports = () => {
             const d = new Date(s.date || s.created_at);
             return d.getMonth() === i && d.getFullYear() === year;
           });
+          // Sum each member's slab commission for this month
+          const monthCommission = allMembers.reduce((sum, member) => {
+            const memberMonthSales = monthSales.filter(s => s.member_id === member.id);
+            return sum + calculateTotalCommission(memberMonthSales);
+          }, 0);
           return {
             month: m,
-            profit: calculateTotalCommission(monthSales)
+            profit: monthCommission
           };
         });
         setProfitTrend(yearlyTrend);
