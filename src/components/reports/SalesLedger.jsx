@@ -1,4 +1,5 @@
 import { Calendar, User, DollarSign, ExternalLink } from 'lucide-react';
+import { calculateCommission } from '../../utils/commission';
 
 export const SalesLedger = ({ sales, members }) => {
   const sortedSales = [...sales].sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
@@ -39,7 +40,7 @@ export const SalesLedger = ({ sales, members }) => {
               sortedSales.map((s, i) => {
                 const member = members.find(m => m.id === s.member_id);
                 const exchangeRate = 280;
-                const commission = (s.amount_usd || 0) * 50;
+                const commission = calculateCommission(s.amount_usd || 0);
                 const netRoi = ((s.amount_usd || 0) * exchangeRate) - commission;
 
                 return (
@@ -72,7 +73,7 @@ export const SalesLedger = ({ sales, members }) => {
                       ${(s.amount_usd || 0).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-[10px] font-bold text-brand-text-muted uppercase">Fixed 1:50</div>
+                      <div className="text-[10px] font-bold text-brand-text-muted uppercase">Slab System</div>
                       <div className="text-brand-secondary font-mono">PKR {commission.toLocaleString()}</div>
                     </td>
                     <td className="px-6 py-4 font-mono font-black text-brand-success">

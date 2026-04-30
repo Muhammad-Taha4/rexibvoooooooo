@@ -7,6 +7,7 @@ import { ExportButtons } from '../components/reports/ExportButtons';
 import { ExecutiveInsights } from '../components/reports/ExecutiveInsights';
 import { SalesLedger } from '../components/reports/SalesLedger';
 import { getSales, getTeamMembers } from '../services/api';
+import { calculateTotalCommission } from '../utils/commission';
 
 export const Reports = () => {
   const [loading, setLoading] = useState(true);
@@ -53,8 +54,8 @@ export const Reports = () => {
         const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
         const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
         
-        // PAYOUTS
-        const totalCommissions = revenue * 50; 
+        // PAYOUTS (per-sale slab commission engine)
+        const totalCommissions = calculateTotalCommission(filteredSales);
         const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
         const totalExpense = totalCommissions + totalBaseSalaries;
         
@@ -68,7 +69,7 @@ export const Reports = () => {
         const breakdown = allMembers.map(m => {
           const mSales = filteredSales.filter(s => s.member_id === m.id);
           const mRev = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
-          const mComm = mRev * 50;
+          const mComm = calculateTotalCommission(mSales);
           const mSalary = m.salary_pkr || 15000;
           const mNetProfit = (mRev * exchangeRate) - (mComm + mSalary);
           
@@ -116,7 +117,7 @@ export const Reports = () => {
           });
           return {
             month: m,
-            profit: monthSales.reduce((a, s) => a + (s.amount_usd || 0), 0) * 50
+            profit: calculateTotalCommission(monthSales)
           };
         });
         setProfitTrend(yearlyTrend);

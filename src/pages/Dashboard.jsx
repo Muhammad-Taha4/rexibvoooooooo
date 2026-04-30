@@ -5,6 +5,7 @@ import { RevenueChart } from '../components/dashboard/RevenueChart';
 import { SalesByMember } from '../components/dashboard/SalesByMember';
 import { TeamPerformance } from '../components/dashboard/TeamPerformance';
 import { getSales, getTeamMembers } from '../services/api';
+import { calculateTotalCommission } from '../utils/commission';
 
 export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -51,8 +52,8 @@ export const Dashboard = () => {
         const revenue = filteredSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
         const upfront = filteredSales.reduce((a, s) => a + (s.upfront_usd || 0), 0);
         
-        // PAYOUTS
-        const totalCommissions = revenue * 50; 
+        // PAYOUTS (per-sale slab commission engine)
+        const totalCommissions = calculateTotalCommission(filteredSales);
         const totalBaseSalaries = allMembers.reduce((a, m) => a + (m.salary_pkr || 15000), 0);
         const totalPayoutPKR = totalCommissions + totalBaseSalaries;
         

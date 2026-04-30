@@ -3,6 +3,7 @@ import { Users, Filter, Plus, RotateCw } from 'lucide-react';
 import { TeamGrid } from '../components/team/TeamGrid';
 import { MemberModal } from '../components/team/MemberModal';
 import { getSales, getTeamMembers, deleteTeamMember } from '../services/api';
+import { calculateTotalCommission } from '../utils/commission';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 export const Team = () => {
@@ -61,7 +62,7 @@ export const Team = () => {
         });
 
         const revenue = mSales.reduce((a, s) => a + (s.amount_usd || 0), 0);
-        const commission = revenue * 50;
+        const commission = calculateTotalCommission(mSales);
         const baseSalary = m.salary_pkr || 15000;
         
         statsMap[m.id] = {
